@@ -6,7 +6,7 @@ export const Card = React.forwardRef<HTMLDivElement, DivProps>(
   ({ className = '', ...props }, ref) => (
     <div
       ref={ref}
-      className={`glass-panel rounded-xl shadow-lg text-card-foreground ${className}`}
+      className={`glass-panel rounded-2xl text-card-foreground ${className}`}
       {...props}
     />
   )
@@ -17,7 +17,7 @@ export const CardHeader = React.forwardRef<HTMLDivElement, DivProps>(
   ({ className = '', ...props }, ref) => (
     <div
       ref={ref}
-      className={`flex flex-col space-y-1.5 p-6 border-b border-white/5 ${className}`}
+      className={`flex flex-col space-y-1.5 p-6 border-b border-gray-100 dark:border-white/5 ${className}`}
       {...props}
     />
   )
@@ -57,7 +57,7 @@ export const CardFooter = React.forwardRef<HTMLDivElement, DivProps>(
   ({ className = '', ...props }, ref) => (
     <div
       ref={ref}
-      className={`flex items-center p-6 pt-0 border-t border-white/5 ${className}`}
+      className={`flex items-center p-6 pt-0 border-t border-gray-100 dark:border-white/5 ${className}`}
       {...props}
     />
   )

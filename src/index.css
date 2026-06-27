@@ -32,7 +32,7 @@
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
-  
+
   --animate-shimmer: shimmer 2s infinite;
   --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
@@ -44,67 +44,66 @@
 }
 
 :root {
-  /* Default Dark Mode (Tesla / Stripe / Vercel high-end dark aesthetics) */
-  --background: 224 25% 6%;
-  --foreground: 210 40% 98%;
-  
-  --card: 224 25% 10%;
-  --card-foreground: 210 40% 98%;
-  
-  --popover: 224 25% 6%;
-  --popover-foreground: 210 40% 98%;
-  
-  --primary: 187 100% 45%; /* #00D5EC */
-  --primary-foreground: 224 25% 6%;
-  
-  --secondary: 142 70% 45%; /* #10B981 */
-  --secondary-foreground: 224 25% 6%;
-  
-  --muted: 224 20% 16%;
-  --muted-foreground: 215 20% 65%;
-  
-  --accent: 224 20% 16%;
-  --accent-foreground: 210 40% 98%;
-  
+  /* IQAir-inspired light theme */
+  --background: 0 0% 100%;
+  --foreground: 0 0% 9%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 9%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 9%;
+
+  --primary: 0 72% 51%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 142 60% 40%;
+  --secondary-foreground: 0 0% 100%;
+
+  --muted: 0 0% 96%;
+  --muted-foreground: 0 0% 45%;
+
+  --accent: 0 0% 96%;
+  --accent-foreground: 0 0% 9%;
+
   --destructive: 0 84% 60%;
-  --destructive-foreground: 210 40% 98%;
-  
-  --border: 224 20% 16%;
-  --input: 224 20% 16%;
-  --ring: 187 100% 45%;
-  
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 0 0% 90%;
+  --input: 0 0% 90%;
+  --ring: 0 72% 51%;
+
   --radius: 0.75rem;
 }
 
-.light {
-  /* Light Mode Fallback */
-  --background: 210 40% 98%;
-  --foreground: 224 25% 10%;
-  
-  --card: 0 0% 100%;
-  --card-foreground: 224 25% 10%;
-  
-  --popover: 0 0% 100%;
-  --popover-foreground: 224 25% 10%;
-  
-  --primary: 197 90% 43%;
-  --primary-foreground: 210 40% 98%;
-  
-  --secondary: 142 70% 35%;
-  --secondary-foreground: 210 40% 98%;
-  
-  --muted: 220 14% 96%;
-  --muted-foreground: 220 9% 46%;
-  
-  --accent: 220 14% 96%;
-  --accent-foreground: 224 25% 10%;
-  
+.dark {
+  --background: 224 25% 6%;
+  --foreground: 210 40% 98%;
+
+  --card: 224 25% 10%;
+  --card-foreground: 210 40% 98%;
+
+  --popover: 224 25% 6%;
+  --popover-foreground: 210 40% 98%;
+
+  --primary: 0 72% 55%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 142 70% 45%;
+  --secondary-foreground: 224 25% 6%;
+
+  --muted: 224 20% 16%;
+  --muted-foreground: 215 20% 65%;
+
+  --accent: 224 20% 16%;
+  --accent-foreground: 210 40% 98%;
+
   --destructive: 0 84% 60%;
   --destructive-foreground: 210 40% 98%;
-  
-  --border: 220 13% 90%;
-  --input: 220 13% 90%;
-  --ring: 197 90% 43%;
+
+  --border: 224 20% 16%;
+  --input: 224 20% 16%;
+  --ring: 0 72% 55%;
 }
 
 * {
@@ -116,6 +115,7 @@ body {
   color: hsl(var(--foreground));
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* Custom Scrollbar */
@@ -129,60 +129,72 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.12);
   border-radius: 9999px;
 }
 
-.light ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.15);
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.2);
 }
 
-/* Glassmorphism Classes */
+/* Card panel — clean white with subtle shadow */
 .glass-panel {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.dark .glass-panel {
   background: rgba(16, 22, 40, 0.6);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.light .glass-panel {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: none;
 }
 
 .glass-panel-hover {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glass-panel-hover:hover {
-  border-color: rgba(0, 229, 255, 0.3);
-  box-shadow: 0 0 20px rgba(0, 229, 255, 0.1);
-  transform: translateY(-2px);
+  border-color: hsl(var(--border));
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
 }
 
-/* Glowing text & lights */
-.glow-text-primary {
-  text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+.dark .glass-panel-hover:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.04);
 }
 
-.glow-text-secondary {
-  text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+/* Nav dropdown */
+.nav-dropdown {
+  animation: dropdownIn 0.18s ease-out forwards;
+}
+
+@keyframes dropdownIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Map customizations */
 .leaflet-container {
-  background-color: #0A0F1D !important;
+  background-color: #f3f4f6 !important;
   border-radius: var(--radius);
 }
 
-.light .leaflet-container {
-  background-color: #f3f4f6 !important;
+.dark .leaflet-container {
+  background-color: #0A0F1D !important;
 }
 
 .leaflet-bar {
@@ -201,20 +213,15 @@ body {
 }
 
 .leaflet-popup-content-wrapper {
-  background: rgba(16, 22, 40, 0.9) !important;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: hsl(var(--card)) !important;
+  border: 1px solid hsl(var(--border));
   color: hsl(var(--foreground)) !important;
   border-radius: var(--radius) !important;
-}
-
-.light .leaflet-popup-content-wrapper {
-  background: rgba(255, 255, 255, 0.95) !important;
-  color: hsl(var(--foreground)) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
 }
 
 .leaflet-popup-tip {
-  background: rgba(16, 22, 40, 0.9) !important;
+  background: hsl(var(--card)) !important;
 }
 
 /* Shimmer Loading Effect */
@@ -233,25 +240,24 @@ body {
   background-image: linear-gradient(
     90deg,
     rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.05) 20%,
-    rgba(255, 255, 255, 0.1) 60%,
+    rgba(0, 0, 0, 0.03) 20%,
+    rgba(0, 0, 0, 0.06) 60%,
     rgba(255, 255, 255, 0) 100%
   );
   content: '';
   animation: shimmer 2s infinite;
 }
 
-.light .shimmer::after {
+.dark .shimmer::after {
   background-image: linear-gradient(
     90deg,
     rgba(255, 255, 255, 0) 0%,
-    rgba(0, 0, 0, 0.03) 20%,
-    rgba(0, 0, 0, 0.07) 60%,
+    rgba(255, 255, 255, 0.05) 20%,
+    rgba(255, 255, 255, 0.1) 60%,
     rgba(255, 255, 255, 0) 100%
   );
 }
 
-/* Simple animation containers */
 .animate-fade-in {
   animation: fadeIn 0.4s ease-out forwards;
 }

@@ -1,158 +1,235 @@
-import React, { useState, useEffect } from 'react';
-import { Sun, Moon, Bell, Search, AlertCircle, Calendar } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
+import { Search, Bell, AlertCircle, User, ChevronDown, Moon, Sun } from 'lucide-react';
 import { AlertItem } from '../types';
+import MobileNav from './MobileNav';
 
 interface HeaderProps {
   alerts: AlertItem[];
   onMarkAllRead: () => void;
 }
 
+interface NavGroup {
+  label: string;
+  items: { name: string; path: string }[];
+}
+
+const NAV_GROUPS: NavGroup[] = [
+  {
+    label: 'Air Quality Data',
+    items: [
+      { name: 'Dashboard Overview', path: '/' },
+      { name: 'Corridor AQI Metrics', path: '/aqi' },
+      { name: 'GIS Corridor Map', path: '/map' },
+    ],
+  },
+  {
+    label: 'Environmental',
+    items: [
+      { name: 'Regional Meteorology', path: '/weather' },
+      { name: 'Haulage Traffic Analysis', path: '/traffic' },
+      { name: 'Dust Leakage Simulator', path: '/simulator' },
+    ],
+  },
+  {
+    label: 'Impact',
+    items: [
+      { name: 'Engineering Mitigations', path: '/solutions' },
+      { name: 'Economic Benefit Calculator', path: '/cost' },
+      { name: 'AI Operations Panel', path: '/recommendations' },
+      { name: 'Compliance & Export Reports', path: '/reports' },
+    ],
+  },
+];
+
 export const Header: React.FC<HeaderProps> = ({ alerts, onMarkAllRead }) => {
   const location = useLocation();
-  const [currentTime, setCurrentTime] = useState(new Date());
-  const [isDark, setIsDark] = useState(true);
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [showAlertsMenu, setShowAlertsMenu] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [isDark, setIsDark] = useState(false);
+  const navRef = useRef<HTMLElement>(null);
 
-  // Update clock every second
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  // Theme toggle side effect
   useEffect(() => {
     if (isDark) {
-      document.documentElement.classList.remove('light');
+      document.documentElement.classList.add('dark');
     } else {
-      document.documentElement.classList.add('light');
+      document.documentElement.classList.remove('dark');
     }
   }, [isDark]);
 
-  // Extract page title from route
-  const getPageTitle = () => {
-    switch (location.pathname) {
-      case '/': return 'Dashboard Overview';
-      case '/aqi': return 'Corridor AQI Metrics';
-      case '/weather': return 'Regional Meteorology';
-      case '/traffic': return 'Haulage Traffic Analysis';
-      case '/map': return 'GIS Corridor Map';
-      case '/simulator': return 'Dust Leakage Simulator';
-      case '/solutions': return 'Engineering Mitigations';
-      case '/cost': return 'Economic Benefit Calculator';
-      case '/recommendations': return 'AI Operations Panel';
-      case '/reports': return 'Compliance & Export Reports';
-      default: return 'DustShield Portal';
-    }
-  };
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (navRef.current && !navRef.current.contains(e.target as Node)) {
+        setOpenMenu(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
-  const unreadAlerts = alerts.filter(a => !a.read);
+  const unreadAlerts = alerts.filter((a) => !a.read);
+
+  const isGroupActive = (group: NavGroup) =>
+    group.items.some((item) => item.path === location.pathname);
 
   return (
-    <header className="h-16 bg-[#0A0F1D]/80 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-8 z-30 shrink-0 relative">
-      {/* Title */}
-      <div className="flex flex-col">
-        <h1 className="text-base font-extrabold text-foreground tracking-tight m-0">{getPageTitle()}</h1>
-        <div className="flex items-center space-x-1.5 text-[10px] text-muted-foreground mt-0.5 font-bold uppercase tracking-wider">
-          <Calendar className="h-3 w-3 text-primary" />
-          <span>Raipur-Bhilai Industrial Zone</span>
-        </div>
-      </div>
+    <header className="sticky top-0 z-50 bg-white dark:bg-[#0A0F1D] border-b border-gray-100 dark:border-white/5 shrink-0">
+      <div className="flex items-center justify-between h-16 px-6 lg:px-10 max-w-[1440px] mx-auto">
+        {/* Logo */}
+        <NavLink to="/" className="flex items-center gap-2.5 shrink-0">
+          <div className="h-8 w-8 bg-[#E02020] rounded-sm flex items-center justify-center">
+            <svg viewBox="0 0 24 24" className="h-4 w-4 text-white" fill="none" stroke="currentColor" strokeWidth="3">
+              <path d="M12 5v14M5 12h14" strokeLinecap="round" />
+            </svg>
+          </div>
+          <span className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">DustShield</span>
+        </NavLink>
 
-      {/* Center Geocode Geolocation Search */}
-      <div className="hidden md:flex items-center w-72 relative">
-        <Search className="absolute left-3 h-4 w-4 text-muted-foreground" />
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search stations, corridors..."
-          className="h-9 w-full rounded-full border border-white/10 bg-[#070B16] pl-9 pr-4 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
-        />
-      </div>
+        {/* Center Navigation */}
+        <nav ref={navRef} className="hidden lg:flex items-center gap-1">
+          {NAV_GROUPS.map((group) => {
+            const active = isGroupActive(group);
+            const isOpen = openMenu === group.label;
 
-      {/* Right Controls */}
-      <div className="flex items-center space-x-5">
-        {/* Date Time */}
-        <div className="hidden lg:flex flex-col items-end text-right font-mono">
-          <span className="text-[11px] font-bold text-foreground leading-none">
-            {currentTime.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-          </span>
-          <span className="text-[9px] text-muted-foreground font-semibold uppercase mt-0.5 tracking-wider">
-            {currentTime.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
-          </span>
-        </div>
+            return (
+              <div key={group.label} className="relative">
+                <button
+                  onClick={() => setOpenMenu(isOpen ? null : group.label)}
+                  className={`flex items-center gap-1 px-4 py-2 rounded-full text-sm font-medium transition-all cursor-pointer ${
+                    active || isOpen
+                      ? 'bg-gray-900 text-white dark:bg-white dark:text-gray-900'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10'
+                  }`}
+                >
+                  {group.label}
+                  <ChevronDown className={`h-3.5 w-3.5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                </button>
 
-        {/* Theme Toggle */}
-        <button
-          onClick={() => setIsDark(!isDark)}
-          className="p-2 rounded-lg bg-card/40 border border-white/5 text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all cursor-pointer"
-          title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
-        >
-          {isDark ? <Sun className="h-4.5 w-4.5" /> : <Moon className="h-4.5 w-4.5" />}
-        </button>
+                {isOpen && (
+                  <div className="nav-dropdown absolute top-full left-0 mt-2 w-64 bg-white dark:bg-[#111827] rounded-2xl shadow-lg border border-gray-100 dark:border-white/10 py-2 overflow-hidden">
+                    {group.items.map((item) => (
+                      <NavLink
+                        key={item.path}
+                        to={item.path}
+                        onClick={() => setOpenMenu(null)}
+                        className={({ isActive }) =>
+                          `block px-5 py-2.5 text-sm transition-colors ${
+                            isActive
+                              ? 'text-gray-900 dark:text-white font-semibold bg-gray-50 dark:bg-white/5'
+                              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5'
+                          }`
+                        }
+                      >
+                        {item.name}
+                      </NavLink>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </nav>
 
-        {/* Notifications / Alerts Menu */}
-        <div className="relative">
+        {/* Right Utilities */}
+        <div className="flex items-center gap-2">
           <button
-            onClick={() => setShowAlertsMenu(!showAlertsMenu)}
-            className="p-2 rounded-lg bg-card/40 border border-white/5 text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all cursor-pointer relative"
+            className="p-2 rounded-full text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors cursor-pointer"
+            title="Search"
           >
-            <Bell className="h-4.5 w-4.5" />
-            {unreadAlerts.length > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 h-4.5 w-4.5 rounded-full bg-red-600 text-[10px] font-extrabold text-white flex items-center justify-center border-2 border-[#0A0F1D]">
-                {unreadAlerts.length}
-              </span>
-            )}
+            <Search className="h-5 w-5" />
           </button>
 
-          {/* Notifications Dropdown */}
-          {showAlertsMenu && (
-            <div className="absolute right-0 mt-3.5 w-80 glass-panel border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden animate-fade-in">
-              <div className="p-3.5 border-b border-white/5 flex items-center justify-between">
-                <span className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
-                  <AlertCircle className="h-4 w-4 text-red-500" /> Active Hazards
-                </span>
-                {unreadAlerts.length > 0 && (
-                  <button
-                    onClick={() => {
-                      onMarkAllRead();
-                      setShowAlertsMenu(false);
-                    }}
-                    className="text-[10px] font-bold text-primary hover:underline cursor-pointer"
-                  >
-                    Clear Warnings
-                  </button>
-                )}
-              </div>
-              <div className="max-h-72 overflow-y-auto divide-y divide-white/5">
-                {alerts.length === 0 ? (
-                  <div className="p-6 text-center text-xs text-muted-foreground">
-                    No active warnings detected.
-                  </div>
-                ) : (
-                  alerts.map((alert) => (
-                    <div key={alert.id} className={`p-3 text-xs space-y-1 hover:bg-white/5 transition-colors ${!alert.read ? 'bg-red-500/5' : ''}`}>
-                      <div className="flex justify-between items-start">
-                        <span className={`font-bold uppercase tracking-wider text-[9px] ${
-                          alert.severity === 'critical' ? 'text-red-500' : alert.severity === 'high' ? 'text-orange-500' : 'text-yellow-500'
-                        }`}>
-                          {alert.severity} • {alert.location}
-                        </span>
-                        <span className="text-[9px] text-muted-foreground font-mono">{alert.timestamp}</span>
+          <button
+            className="hidden sm:flex items-center gap-1.5 px-2 py-1.5 rounded-full text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors cursor-pointer text-sm"
+            title="Region"
+          >
+            <span className="text-base leading-none">🇮🇳</span>
+            <ChevronDown className="h-3.5 w-3.5" />
+          </button>
+
+          <button
+            onClick={() => setIsDark(!isDark)}
+            className="p-2 rounded-full text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors cursor-pointer"
+            title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          >
+            {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </button>
+
+          <div className="relative">
+            <button
+              onClick={() => setShowAlertsMenu(!showAlertsMenu)}
+              className="p-2 rounded-full text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors cursor-pointer relative"
+            >
+              <Bell className="h-5 w-5" />
+              {unreadAlerts.length > 0 && (
+                <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-[#E02020]" />
+              )}
+            </button>
+
+            {showAlertsMenu && (
+              <div className="absolute right-0 mt-3 w-80 bg-white dark:bg-[#111827] border border-gray-100 dark:border-white/10 rounded-2xl shadow-xl z-50 overflow-hidden nav-dropdown">
+                <div className="p-4 border-b border-gray-100 dark:border-white/5 flex items-center justify-between">
+                  <span className="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
+                    <AlertCircle className="h-4 w-4 text-[#E02020]" /> Active Hazards
+                  </span>
+                  {unreadAlerts.length > 0 && (
+                    <button
+                      onClick={() => {
+                        onMarkAllRead();
+                        setShowAlertsMenu(false);
+                      }}
+                      className="text-xs font-semibold text-[#E02020] hover:underline cursor-pointer"
+                    >
+                      Clear All
+                    </button>
+                  )}
+                </div>
+                <div className="max-h-72 overflow-y-auto divide-y divide-gray-100 dark:divide-white/5">
+                  {alerts.length === 0 ? (
+                    <div className="p-6 text-center text-sm text-gray-500">No active warnings detected.</div>
+                  ) : (
+                    alerts.map((alert) => (
+                      <div
+                        key={alert.id}
+                        className={`p-4 text-sm space-y-1 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors ${
+                          !alert.read ? 'bg-red-50 dark:bg-red-500/5' : ''
+                        }`}
+                      >
+                        <div className="flex justify-between items-start">
+                          <span
+                            className={`font-bold uppercase tracking-wider text-[10px] ${
+                              alert.severity === 'critical'
+                                ? 'text-red-600'
+                                : alert.severity === 'high'
+                                  ? 'text-orange-500'
+                                  : 'text-yellow-600'
+                            }`}
+                          >
+                            {alert.severity} • {alert.location}
+                          </span>
+                          <span className="text-[10px] text-gray-400 font-mono">{alert.timestamp}</span>
+                        </div>
+                        <p className="font-semibold text-gray-900 dark:text-white leading-snug">{alert.title}</p>
+                        <p className="text-xs text-gray-500 leading-relaxed">{alert.message}</p>
                       </div>
-                      <p className="font-semibold text-foreground leading-snug">{alert.title}</p>
-                      <p className="text-[10px] text-muted-foreground leading-relaxed">{alert.message}</p>
-                    </div>
-                  ))
-                )}
+                    ))
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
+
+          <button
+            className="p-2 rounded-full text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors cursor-pointer"
+            title="Account"
+          >
+            <User className="h-5 w-5" />
+          </button>
         </div>
       </div>
+      <MobileNav />
     </header>
   );
 };
+
 export default Header;

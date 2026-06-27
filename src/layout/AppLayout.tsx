@@ -1,6 +1,5 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom';
-import Sidebar from './Sidebar';
+import { Outlet, useLocation } from 'react-router-dom';
 import Header from './Header';
 import { AlertItem } from '../types';
 
@@ -10,38 +9,44 @@ interface AppLayoutProps {
 }
 
 export const AppLayout: React.FC<AppLayoutProps> = ({ alerts, onMarkAllRead }) => {
+  const location = useLocation();
+  const isDashboard = location.pathname === '/';
+
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-background text-foreground transition-colors duration-200">
-      {/* Sidebar Navigation */}
-      <Sidebar />
+    <div className="flex flex-col min-h-screen bg-white dark:bg-[#050914] text-foreground transition-colors duration-200">
+      <Header alerts={alerts} onMarkAllRead={onMarkAllRead} />
 
-      {/* Main Core Container */}
-      <div className="flex flex-col flex-1 h-screen overflow-hidden">
-        {/* Top Header Controls */}
-        <Header alerts={alerts} onMarkAllRead={onMarkAllRead} />
-
-        {/* Dynamic Route Content */}
-        <main className="flex-1 overflow-y-auto p-6 md:p-8 scrollbar-thin bg-radial from-[#0c142c] to-[#050914] dark:bg-none">
-          <div className="mx-auto max-w-7xl space-y-6">
+      <main className="flex-1 overflow-y-auto scrollbar-thin">
+        {isDashboard ? (
+          <Outlet />
+        ) : (
+          <div className="max-w-[1440px] mx-auto px-6 lg:px-10 py-10">
             <Outlet />
           </div>
-        </main>
+        )}
+      </main>
 
-        {/* compliance Footer */}
-        <footer className="h-10 border-t border-white/5 bg-[#0A0F1D]/60 flex items-center justify-between px-8 text-[10px] text-muted-foreground shrink-0 select-none">
-          <div className="flex items-center space-x-1 font-mono">
-            <span>Lat/Lng:</span>
-            <span className="text-foreground">21.2150° N, 81.4500° E</span>
-            <span className="text-white/10">|</span>
-            <span>Status:</span>
-            <span className="text-emerald-400 font-bold">CPCB Compliant</span>
+      <footer className="border-t border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-[#0A0F1D]/60 py-4 px-6 lg:px-10 shrink-0">
+        <div className="max-w-[1440px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-gray-500 dark:text-muted-foreground">
+          <div className="flex items-center gap-3">
+            <span>
+              Lat/Lng: <span className="text-gray-700 dark:text-foreground font-medium">21.2150° N, 81.4500° E</span>
+            </span>
+            <span className="hidden sm:inline text-gray-300 dark:text-white/10">|</span>
+            <span>
+              Status: <span className="text-emerald-600 dark:text-emerald-400 font-semibold">CPCB Compliant</span>
+            </span>
           </div>
-          <div>
-            <span>DustShield Environmental Intel Systems © 2026. All rights reserved.</span>
+          <div className="text-center sm:text-right">
+            <span>DustShield © 2026. All rights reserved.</span>
+            <span className="block mt-0.5 text-gray-400 dark:text-gray-500">
+              Made by Suyash Chandrakar
+            </span>
           </div>
-        </footer>
-      </div>
+        </div>
+      </footer>
     </div>
   );
 };
+
 export default AppLayout;
